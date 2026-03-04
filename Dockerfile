@@ -3,6 +3,9 @@
 # ============================================
 FROM node:20-alpine AS build
 
+# Ferramentas de build para módulos nativos (better-sqlite3, etc.)
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 # Copiar apenas arquivos de dependência primeiro (cache de layers)
@@ -22,13 +25,18 @@ RUN npm run build
 # ============================================
 FROM node:20-alpine AS production
 
+# Ferramentas de build para módulos nativos
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 # Copiar apenas o necessário para produção
 COPY package.json package-lock.json ./
 
-# Instalar apenas dependências de produção + tsx (runtime TypeScript)
-RUN npm ci --omit=dev && npm install tsx
+# Instalar dependências de produção + tsx (runtime TypeScript)
+RUN npm ci --omit=dev && npm install tsx \
+    && apk del python3 make g++ \
+    && rm -rf /tmp/* /root/.npm
 
 # Copiar o front-end buildado
 COPY --from=build /app/dist ./dist
@@ -42,5 +50,9 @@ EXPOSE 3000
 # Definir ambiente de produção
 ENV NODE_ENV=production
 
+# Health check para Easypanel
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+
 # Iniciar o servidor
-CMD ["npx", "tsx", "server.ts"]
+CMD ["node", "--import", "tsx", "server.ts"]

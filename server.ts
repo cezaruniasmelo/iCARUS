@@ -1,5 +1,4 @@
 import express from "express";
-import { createServer as createViteServer } from "vite";
 import { google } from "googleapis";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -12,6 +11,11 @@ const PORT = parseInt(process.env.PORT || "3000", 10);
 app.use(express.json());
 app.use(cookieParser());
 
+// Health check endpoint (usado pelo Easypanel para verificar se o serviço está ativo)
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
@@ -23,9 +27,9 @@ const oauth2Client = new google.auth.OAuth2(
 app.get("/api/auth/google/url", (req, res) => {
   try {
     if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-      return res.status(400).json({ 
-        error: "Configuração ausente", 
-        message: "Por favor, adicione GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET nos Secrets do AI Studio." 
+      return res.status(400).json({
+        error: "Configuração ausente",
+        message: "Por favor, adicione GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET nos Secrets do AI Studio."
       });
     }
 
@@ -106,7 +110,7 @@ app.get("/api/calendar/free-slots", async (req, res) => {
     for (let h = 9; h < 17; h++) {
       const slotStart = new Date(`${date}T${h.toString().padStart(2, "0")}:00:00Z`);
       const slotEnd = new Date(`${date}T${(h + 1).toString().padStart(2, "0")}:00:00Z`);
-      
+
       const isBusy = busy.some(b => {
         const bStart = new Date(b.start!);
         const bEnd = new Date(b.end!);
@@ -155,6 +159,8 @@ app.post("/api/calendar/book", async (req, res) => {
 
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    // Import dinâmico — vite só é carregado em dev mode
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -166,7 +172,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`[iCARUS] Server running on http://0.0.0.0:${PORT} (${process.env.NODE_ENV || "development"})`);
   });
 }
 
