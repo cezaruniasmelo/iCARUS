@@ -246,20 +246,7 @@ const Navbar = ({ onOpenChat }: { onOpenChat: () => void }) => {
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <img 
-            src="https://ais-pre-ij27sxlv3f6nq4qtdebrsi-212115760682.us-east1.run.app/logo.png" 
-            alt="iCARUS Logo" 
-            className="w-12 h-12 object-contain"
-            onError={(e) => {
-              // Fallback to icon if image fails
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden');
-            }}
-            referrerPolicy="no-referrer"
-          />
-          <div className="fallback-icon hidden w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center text-white shadow-lg shadow-teal-500/20">
-            <Rocket size={24} />
-          </div>
+          <Logo className="w-10 h-10" />
           <span className="text-2xl font-display font-bold tracking-tight text-slate-900">
             iCARUS <span className="text-teal-600">Soluções</span>
           </span>
@@ -321,6 +308,17 @@ const Navbar = ({ onOpenChat }: { onOpenChat: () => void }) => {
     </nav>
   );
 };
+
+// --- Components ---
+
+const Logo = ({ className = "w-10 h-10" }: { className?: string }) => (
+  <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 60C60 60 80 100 100 140C120 100 140 60 180 60" stroke="#94A3B8" strokeWidth="12" strokeLinecap="round"/>
+    <path d="M40 80C70 80 85 110 100 140C115 110 130 80 160 80" stroke="#64748B" strokeWidth="10" strokeLinecap="round"/>
+    <path d="M100 40C100 40 140 100 100 160C60 100 100 40Z" fill="#0D9488" />
+    <path d="M100 70C100 70 125 110 100 150C75 110 100 70Z" fill="#2DD4BF" opacity="0.5" />
+  </svg>
+);
 
 const FeatureCard = ({ icon: Icon, title, description, delay = 0, ...props }: { icon: any, title: string, description: string, delay?: number, [key: string]: any }) => (
   <motion.div 
@@ -425,8 +423,8 @@ export default function App() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-100 text-teal-700 text-sm font-semibold mb-6">
-              <Zap size={16} />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-50 border border-teal-100 text-teal-700 text-sm font-semibold mb-6 whitespace-nowrap">
+              <Zap size={16} className="text-teal-500" />
               <span>O Copiloto do Gestor de Projetos</span>
             </div>
             <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 leading-[1.1] mb-6 font-display">
@@ -436,12 +434,12 @@ export default function App() {
             <p className="text-xl text-slate-600 mb-10 leading-relaxed max-w-xl">
               Automatize 80% das atividades operacionais e foque no que realmente importa: extrair valor e garantir o sucesso do seu projeto.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <button className="bg-teal-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-teal-700 transition-all shadow-xl shadow-teal-600/20 flex items-center gap-2 group">
+            <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <button className="bg-teal-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-teal-700 transition-all shadow-xl shadow-teal-600/20 flex items-center justify-center gap-2 group">
                 Conhecer o Sistema
                 <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all">
+              <button className="bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all flex justify-center items-center">
                 Ver Demonstração
               </button>
             </div>
@@ -699,25 +697,25 @@ export default function App() {
                 title: "PMP®",
                 subtitle: "Project Management Professional",
                 desc: "A certificação mais importante do mundo para gerentes de projeto.",
-                img: "https://images.credly.com/size/340x340/images/2d678f68-389c-444d-a332-2253b561f9d1/PMP.png"
+                img: "https://www.pmi.org/-/media/pmi/badges/pmp_600x600.png"
               },
               {
                 title: "PMI-ACP®",
                 subtitle: "Agile Certified Practitioner",
                 desc: "Especialistas em metodologias ágeis (Scrum, Kanban, Lean, XP).",
-                img: "https://images.credly.com/size/340x340/images/62694936-2a78-47db-9356-27ef27039699/PMI-ACP.png"
+                img: "https://www.pmi.org/-/media/pmi/badges/pmi-acp_600x600.png"
               },
               {
                 title: "CAPM®",
                 subtitle: "Certified Associate in PM",
                 desc: "Domínio fundamental dos processos e terminologias do PMBOK®.",
-                img: "https://images.credly.com/size/340x340/images/33036668-3949-4702-8f5d-209252327702/CAPM.png"
+                img: "https://www.pmi.org/-/media/pmi/badges/capm_600x600.png"
               },
               {
                 title: "DASM™",
                 subtitle: "Disciplined Agile Scrum Master",
                 desc: "Abordagem ágil disciplinada para otimização de fluxos de trabalho.",
-                img: "https://images.credly.com/size/340x340/images/83348630-f475-4340-802c-7467771746f3/DASM.png"
+                img: "https://www.pmi.org/-/media/pmi/badges/dasm_600x600.png"
               }
             ].map((cert, i) => (
               <motion.div 
@@ -728,12 +726,21 @@ export default function App() {
                 viewport={{ once: true }}
                 className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-md transition-shadow"
               >
-                <img 
-                  src={cert.img} 
-                  alt={cert.title} 
-                  className="w-32 h-32 mb-6 object-contain"
-                  referrerPolicy="no-referrer"
-                />
+                <div className="relative w-32 h-32 mb-6 flex items-center justify-center">
+                  <img 
+                    src={cert.img} 
+                    alt={cert.title} 
+                    className="w-full h-full object-contain relative z-10"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement?.querySelector('.cert-fallback')?.classList.remove('hidden');
+                    }}
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="cert-fallback hidden absolute inset-0 bg-teal-50 rounded-full flex items-center justify-center text-teal-600">
+                    <ShieldCheck size={48} />
+                  </div>
+                </div>
                 <h4 className="text-xl font-bold text-slate-900 mb-1">{cert.title}</h4>
                 <p className="text-teal-600 text-sm font-semibold mb-3">{cert.subtitle}</p>
                 <p className="text-slate-500 text-xs leading-relaxed">{cert.desc}</p>
@@ -749,12 +756,7 @@ export default function App() {
           <div className="grid md:grid-cols-4 gap-12 mb-20">
             <div className="col-span-2">
               <div className="flex items-center gap-3 mb-6">
-                <img 
-                  src="https://ais-pre-ij27sxlv3f6nq4qtdebrsi-212115760682.us-east1.run.app/logo.png" 
-                  alt="iCARUS Logo" 
-                  className="w-10 h-10 object-contain"
-                  referrerPolicy="no-referrer"
-                />
+                <Logo className="w-10 h-10" />
                 <span className="text-xl font-display font-bold tracking-tight text-slate-900">
                   iCARUS <span className="text-teal-600">Soluções</span>
                 </span>
