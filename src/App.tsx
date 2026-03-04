@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Rocket, 
-  ShieldCheck, 
-  Zap, 
-  Users, 
-  BarChart3, 
-  Calendar, 
-  MessageSquare, 
-  FileText, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Lightbulb, 
-  Clock, 
+import {
+  Rocket,
+  ShieldCheck,
+  Zap,
+  Users,
+  BarChart3,
+  Calendar,
+  MessageSquare,
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
+  Lightbulb,
+  Clock,
   ChevronRight,
   Menu,
   X,
@@ -30,8 +30,8 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI, Type, GenerateContentResponse, ThinkingLevel } from "@google/genai";
 
-// Initialize Gemini
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+// Initialize Gemini is deferred to action to prevent render crashes if API key is empty
+// const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 const Chatbot = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [messages, setMessages] = useState<{ role: 'user' | 'model'; text: string }[]>([
@@ -47,6 +47,15 @@ const Chatbot = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
+
+    // Pega a chave gerada pelo Vite em dev, ou injetada pelo server.ts em prod
+    const apiKey = (window as any).ENV?.GEMINI_API_KEY || process.env.GEMINI_API_KEY || "";
+    if (!apiKey) {
+      setMessages(prev => [...prev, { role: 'model', text: "Erro: A chave da API Gemini não está configurada no servidor." }]);
+      return;
+    }
+
+    const genAI = new GoogleGenAI({ apiKey });
 
     const userMessage = input;
     setInput('');
@@ -107,7 +116,7 @@ const Chatbot = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
       };
 
       const response = await genAI.models.generateContent(chatParams);
-      
+
       if (response.functionCalls) {
         const toolResponses = [];
         for (const call of response.functionCalls) {
@@ -180,11 +189,10 @@ const Chatbot = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/50">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${
-                  m.role === 'user' 
-                    ? 'bg-teal-600 text-white rounded-tr-none' 
+                <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${m.role === 'user'
+                    ? 'bg-teal-600 text-white rounded-tr-none'
                     : 'bg-white text-slate-700 shadow-sm border border-slate-100 rounded-tl-none'
-                }`}>
+                  }`}>
                   {m.text}
                 </div>
               </div>
@@ -202,15 +210,15 @@ const Chatbot = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           {/* Input */}
           <div className="p-4 bg-white border-t border-slate-100">
             <div className="flex gap-2">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder="Digite sua mensagem..."
                 className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-teal-500 transition-colors"
               />
-              <button 
+              <button
                 onClick={handleSendMessage}
                 disabled={isLoading}
                 className="bg-teal-600 text-white p-2 rounded-xl hover:bg-teal-700 transition-colors disabled:opacity-50"
@@ -255,15 +263,15 @@ const Navbar = ({ onOpenChat }: { onOpenChat: () => void }) => {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <a 
-              key={link.name} 
-              href={link.href} 
+            <a
+              key={link.name}
+              href={link.href}
               className="text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors"
             >
               {link.name}
             </a>
           ))}
-          <button 
+          <button
             onClick={onOpenChat}
             className="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-teal-600 transition-all shadow-md active:scale-95"
           >
@@ -280,23 +288,23 @@ const Navbar = ({ onOpenChat }: { onOpenChat: () => void }) => {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             className="absolute top-full left-0 right-0 bg-white border-t border-slate-100 p-6 flex flex-col gap-4 md:hidden shadow-xl"
           >
             {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href} 
+              <a
+                key={link.name}
+                href={link.href}
                 className="text-lg font-medium text-slate-600"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.name}
               </a>
             ))}
-            <button 
+            <button
               onClick={onOpenChat}
               className="bg-teal-600 text-white px-6 py-3 rounded-xl font-semibold w-full"
             >
@@ -313,15 +321,15 @@ const Navbar = ({ onOpenChat }: { onOpenChat: () => void }) => {
 
 const Logo = ({ className = "w-10 h-10" }: { className?: string }) => (
   <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20 60C60 60 80 100 100 140C120 100 140 60 180 60" stroke="#94A3B8" strokeWidth="12" strokeLinecap="round"/>
-    <path d="M40 80C70 80 85 110 100 140C115 110 130 80 160 80" stroke="#64748B" strokeWidth="10" strokeLinecap="round"/>
+    <path d="M20 60C60 60 80 100 100 140C120 100 140 60 180 60" stroke="#94A3B8" strokeWidth="12" strokeLinecap="round" />
+    <path d="M40 80C70 80 85 110 100 140C115 110 130 80 160 80" stroke="#64748B" strokeWidth="10" strokeLinecap="round" />
     <path d="M100 40C100 40 140 100 100 160C60 100 100 40Z" fill="#0D9488" />
     <path d="M100 70C100 70 125 110 100 150C75 110 100 70Z" fill="#2DD4BF" opacity="0.5" />
   </svg>
 );
 
 const FeatureCard = ({ icon: Icon, title, description, delay = 0, ...props }: { icon: any, title: string, description: string, delay?: number, [key: string]: any }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -345,7 +353,7 @@ export default function App() {
     try {
       const res = await fetch('/api/auth/google/url');
       const data = await res.json();
-      
+
       if (!res.ok) {
         alert(data.message || "Erro ao iniciar conexão com Google.");
         return;
@@ -382,7 +390,7 @@ export default function App() {
       <Chatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
 
       {/* Specialist Config Button (Hidden in production, for demo setup) */}
-      <button 
+      <button
         onClick={() => setIsConfigOpen(!isConfigOpen)}
         className="fixed bottom-6 left-6 w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-300 transition-all z-50"
         title="Configuração do Especialista"
@@ -392,7 +400,7 @@ export default function App() {
 
       <AnimatePresence>
         {isConfigOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -400,7 +408,7 @@ export default function App() {
           >
             <h4 className="font-bold mb-2">Setup do Especialista</h4>
             <p className="text-xs text-slate-500 mb-4">Conecte seu Google Calendar para que o chatbot possa marcar reuniões.</p>
-            <button 
+            <button
               onClick={handleConnectCalendar}
               className="w-full bg-teal-600 text-white py-2 rounded-xl text-sm font-bold hover:bg-teal-700 transition-all"
             >
@@ -465,17 +473,17 @@ export default function App() {
             className="relative"
           >
             <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl border border-white/20">
-              <img 
-                src="https://picsum.photos/seed/dashboard/1200/900" 
-                alt="iCarus Dashboard" 
+              <img
+                src="https://picsum.photos/seed/dashboard/1200/900"
+                alt="iCarus Dashboard"
                 className="w-full h-auto"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
             </div>
-            
+
             {/* Floating Elements */}
-            <motion.div 
+            <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 4, repeat: Infinity }}
               className="absolute -top-6 -right-6 glass-card p-4 rounded-2xl z-20 hidden sm:block"
@@ -491,7 +499,7 @@ export default function App() {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               animate={{ y: [0, 10, 0] }}
               transition={{ duration: 5, repeat: Infinity, delay: 1 }}
               className="absolute -bottom-6 -left-6 glass-card p-4 rounded-2xl z-20 hidden sm:block"
@@ -588,9 +596,9 @@ export default function App() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <FeatureCard 
-                key={feature.title + index} 
-                {...feature} 
+              <FeatureCard
+                key={feature.title + index}
+                {...feature}
                 delay={index * 0.05}
               />
             ))}
@@ -604,9 +612,9 @@ export default function App() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
               <div className="aspect-square rounded-[3rem] bg-slate-200 overflow-hidden shadow-2xl">
-                <img 
-                  src="https://picsum.photos/seed/team/800/800" 
-                  alt="iCarus Team" 
+                <img
+                  src="https://picsum.photos/seed/team/800/800"
+                  alt="iCarus Team"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -663,7 +671,7 @@ export default function App() {
             <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-teal-500 blur-[120px] rounded-full" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-emerald-500 blur-[120px] rounded-full" />
           </div>
-          
+
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 font-display relative z-10">
             Pronto para o futuro da <br /> <span className="text-teal-400">Gestão de Projetos?</span>
           </h2>
@@ -718,7 +726,7 @@ export default function App() {
                 img: "https://www.pmi.org/-/media/pmi/badges/dasm_600x600.png"
               }
             ].map((cert, i) => (
-              <motion.div 
+              <motion.div
                 key={cert.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -727,9 +735,9 @@ export default function App() {
                 className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-md transition-shadow"
               >
                 <div className="relative w-32 h-32 mb-6 flex items-center justify-center">
-                  <img 
-                    src={cert.img} 
-                    alt={cert.title} 
+                  <img
+                    src={cert.img}
+                    alt={cert.title}
                     className="w-full h-full object-contain relative z-10"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';

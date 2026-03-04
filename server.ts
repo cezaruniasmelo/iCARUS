@@ -167,8 +167,19 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static("dist"));
-    app.get("*", (req, res) => res.sendFile("dist/index.html", { root: "." }));
+    app.use(express.static("dist", { index: false })); // Impede que o static sirva o index automaticamente
+    app.get("*", async (req, res) => {
+      try {
+        const fs = await import("fs");
+        let html = await fs.promises.readFile("dist/index.html", "utf-8");
+        // Injeta as variáveis de ambiente necessárias em RUNTIME no front-end
+        const script = `<script>window.ENV = { GEMINI_API_KEY: "${process.env.GEMINI_API_KEY || ''}" };</script>`;
+        html = html.replace("<head>", "<head>" + script);
+        res.send(html);
+      } catch (err) {
+        res.status(500).send("Error loading application");
+      }
+    });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
