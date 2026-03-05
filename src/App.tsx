@@ -438,10 +438,15 @@ export default function App() {
               Automatize 80% das atividades operacionais e foque no que realmente importa: extrair valor e garantir o sucesso do seu projeto.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <button className="bg-teal-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-teal-700 transition-all shadow-xl shadow-teal-600/20 flex items-center justify-center gap-2 group">
+              <a
+                href="https://icarusproject-projectmind.eqg19v.easypanel.host/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-teal-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-teal-700 transition-all shadow-xl shadow-teal-600/20 flex items-center justify-center gap-2 group"
+              >
                 Conhecer o Sistema
                 <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              </a>
               <button className="bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all flex justify-center items-center">
                 Ver Demonstração
               </button>
@@ -456,7 +461,7 @@ export default function App() {
                 ))}
               </div>
               <p className="text-sm text-slate-500 font-medium">
-                <span className="text-slate-900 font-bold">+500 gestores</span> já utilizam o iCarus
+                <span className="text-slate-900 font-bold">+500 gestores</span> já utilizam O Project Mind Manager da iCarus
               </p>
             </div>
           </motion.div>
