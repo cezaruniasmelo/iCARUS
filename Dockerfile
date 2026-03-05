@@ -50,9 +50,9 @@ EXPOSE 3000
 # Definir ambiente de produção
 ENV NODE_ENV=production
 
-# Health check para Easypanel
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+# Health check para Easypanel (127.0.0.1 previne problema de res IPv6 de localhost)
+HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/health || exit 1
 
 # Iniciar o servidor
 CMD ["node", "--import", "tsx", "server.ts"]
