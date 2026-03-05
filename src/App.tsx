@@ -190,8 +190,8 @@ const Chatbot = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${m.role === 'user'
-                    ? 'bg-teal-600 text-white rounded-tr-none'
-                    : 'bg-white text-slate-700 shadow-sm border border-slate-100 rounded-tl-none'
+                  ? 'bg-teal-600 text-white rounded-tr-none'
+                  : 'bg-white text-slate-700 shadow-sm border border-slate-100 rounded-tl-none'
                   }`}>
                   {m.text}
                 </div>
@@ -320,12 +320,7 @@ const Navbar = ({ onOpenChat }: { onOpenChat: () => void }) => {
 // --- Components ---
 
 const Logo = ({ className = "w-10 h-10" }: { className?: string }) => (
-  <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20 60C60 60 80 100 100 140C120 100 140 60 180 60" stroke="#94A3B8" strokeWidth="12" strokeLinecap="round" />
-    <path d="M40 80C70 80 85 110 100 140C115 110 130 80 160 80" stroke="#64748B" strokeWidth="10" strokeLinecap="round" />
-    <path d="M100 40C100 40 140 100 100 160C60 100 100 40Z" fill="#0D9488" />
-    <path d="M100 70C100 70 125 110 100 150C75 110 100 70Z" fill="#2DD4BF" opacity="0.5" />
-  </svg>
+  <img src="/logo-icarus.png" alt="iCARUS" className={`${className} object-contain`} />
 );
 
 const FeatureCard = ({ icon: Icon, title, description, delay = 0, ...props }: { icon: any, title: string, description: string, delay?: number, [key: string]: any }) => (
