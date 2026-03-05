@@ -167,17 +167,27 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static("dist", { index: false })); // Impede que o static sirva o index automaticamente
+    const path = await import("path");
+    app.use(express.static(path.join(process.cwd(), "dist"), { index: false })); // Impede que o static sirva o index automaticamente
     app.get("*", async (req, res) => {
       try {
         const fs = await import("fs");
-        let html = await fs.promises.readFile("dist/index.html", "utf-8");
-        // Injeta as variáveis de ambiente necessárias em RUNTIME no front-end
-        const script = `<script>window.ENV = { GEMINI_API_KEY: "${process.env.GEMINI_API_KEY || ''}" };</script>`;
+        let html = await fs.promises.readFile(path.join(process.cwd(), "dist", "index.html"), "utf-8");
+        // Injeta as variáveis de ambiente necessárias em RUNTIME no front-end e Error Boundary
+        const script = `
+        <script>
+          window.ENV = { GEMINI_API_KEY: "${process.env.GEMINI_API_KEY || ''}" };
+          window.onerror = function(msg, url, line) {
+            var el = document.createElement('div');
+            el.style = 'position:fixed;top:0;left:0;z-index:9999;background:red;color:white;padding:20px;font-family:monospace;font-size:16px;width:100%;';
+            el.innerHTML = '<h3>ERRO CRÍTICO NO FRONT-END (Tela Branca)</h3><hr/><b>Mensagem:</b> ' + msg + '<br/><b>Linha:</b> ' + line + '<br/><b>Arquivo:</b> ' + url;
+            document.body.prepend(el);
+          };
+        </script>`;
         html = html.replace("<head>", "<head>" + script);
         res.send(html);
       } catch (err) {
-        res.status(500).send("Error loading application");
+        res.status(500).send("Error loading HTML: " + String(err));
       }
     });
   }
